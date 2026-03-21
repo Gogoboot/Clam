@@ -1,10 +1,10 @@
+use crate::error::AppError;
 use async_trait::async_trait;
 use std::path::PathBuf;
 use tauri::AppHandle;
-use crate::error::AppError;
 
 /// Информация о модели — передаётся на фронтенд
-/// 
+///
 /// `serde` — библиотека сериализации. Derive-макрос автоматически
 /// генерирует код для конвертации структуры в JSON и обратно.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

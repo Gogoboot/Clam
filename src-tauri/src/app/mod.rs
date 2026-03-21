@@ -1,7 +1,7 @@
-use std::sync::Arc;
-use crate::transcriber::traits::Transcriber;
-use crate::model_manager::traits::ModelManager;
 use crate::file_handler::traits::FileHandler;
+use crate::model_manager::traits::ModelManager;
+use crate::transcriber::traits::Transcriber;
+use std::sync::Arc;
 
 pub struct AppState {
     pub transcriber: Arc<dyn Transcriber>,

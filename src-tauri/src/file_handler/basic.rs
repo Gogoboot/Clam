@@ -1,7 +1,7 @@
+use super::traits::FileHandler;
+use crate::error::AppError;
 use async_trait::async_trait;
 use std::path::{Path, PathBuf};
-use crate::error::AppError;
-use super::traits::FileHandler;
 
 pub struct BasicFileHandler;
 

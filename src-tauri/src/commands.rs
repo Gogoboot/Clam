@@ -1,10 +1,10 @@
-use tauri::{AppHandle, State};
 use crate::app::AppState;
 use crate::error::AppError;
 use crate::model_manager::traits::ModelInfo;
+use tauri::{AppHandle, State};
 
 /// Возвращает список доступных моделей фронтенду.
-/// 
+///
 /// `#[tauri::command]` — макрос который регистрирует функцию
 /// как IPC-команду. Фронтенд вызывает её через invoke('list_models').
 #[tauri::command]
@@ -16,7 +16,7 @@ pub async fn list_models(
 }
 
 /// Транскрибирует аудио файл с выбранной моделью.
-/// 
+///
 /// Теперь принимает `model_filename` — имя файла модели.
 /// Например: "ggml-large-v3.bin" или "ggml-small.bin"
 #[tauri::command]

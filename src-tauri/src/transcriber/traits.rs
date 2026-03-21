@@ -1,6 +1,6 @@
+use crate::error::AppError;
 use async_trait::async_trait;
 use std::path::Path;
-use crate::error::AppError;
 
 #[async_trait]
 pub trait Transcriber: Send + Sync {

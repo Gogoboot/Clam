@@ -1,11 +1,11 @@
+use super::traits::Transcriber;
+use crate::error::AppError;
 use async_trait::async_trait;
 use std::path::Path;
 use tauri::AppHandle;
-use tauri_plugin_shell::ShellExt;
-use tauri_plugin_shell::process::CommandEvent;
 use tauri::Emitter;
-use crate::error::AppError;
-use super::traits::Transcriber;
+use tauri_plugin_shell::process::CommandEvent;
+use tauri_plugin_shell::ShellExt;
 
 pub struct WhisperSidecar {
     app: AppHandle,
@@ -20,16 +20,21 @@ impl WhisperSidecar {
 #[async_trait]
 impl Transcriber for WhisperSidecar {
     async fn transcribe(&self, audio_path: &Path, model_path: &Path) -> Result<String, AppError> {
-        let (mut rx, _child) = self.app
+        let (mut rx, _child) = self
+            .app
             .shell()
             .sidecar("whisper-cli")
             .map_err(|e| AppError::Sidecar(e.to_string()))?
             .args([
-                "-l", "ru",
-                "-f", audio_path.to_str().unwrap(),
-                "-m", model_path.to_str().unwrap(),
+                "-l",
+                "ru",
+                "-f",
+                audio_path.to_str().unwrap(),
+                "-m",
+                model_path.to_str().unwrap(),
                 "-ojf",
-                "-of", audio_path.to_str().unwrap(),
+                "-of",
+                audio_path.to_str().unwrap(),
             ])
             .spawn()
             .map_err(|e| AppError::Sidecar(e.to_string()))?;

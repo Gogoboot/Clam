@@ -1,8 +1,8 @@
+use super::traits::{ModelInfo, ModelManager};
+use crate::error::AppError;
 use async_trait::async_trait;
 use std::path::PathBuf;
 use tauri::AppHandle;
-use crate::error::AppError;
-use super::traits::{ModelManager, ModelInfo};
 
 pub struct LocalFsModelManager;
 
@@ -21,7 +21,9 @@ impl LocalFsModelManager {
 
         #[cfg(not(debug_assertions))]
         {
-            let resource_dir = app.path().resource_dir()
+            let resource_dir = app
+                .path()
+                .resource_dir()
                 .map_err(|e| AppError::Internal(format!("resource_dir недоступен: {e}")))?;
             Ok(resource_dir.join("models"))
         }
@@ -43,7 +45,8 @@ impl ModelManager for LocalFsModelManager {
             return Ok(vec![]);
         }
 
-        let mut read_dir = tokio::fs::read_dir(&dir).await
+        let mut read_dir = tokio::fs::read_dir(&dir)
+            .await
             .map_err(|e| AppError::Internal(format!("Не могу читать папку моделей: {e}")))?;
 
         let mut models = Vec::new();
@@ -53,29 +56,34 @@ impl ModelManager for LocalFsModelManager {
             let path: PathBuf = entry.path();
 
             // Фильтруем только .bin файлы
-            let ext = path.extension()
-                .and_then(|e| e.to_str())
-                .unwrap_or("");
+            let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("");
             if ext != "bin" {
                 continue;
             }
 
-            let filename = path.file_name()
+            let filename = path
+                .file_name()
                 .and_then(|n| n.to_str())
                 .unwrap_or("")
                 .to_string();
 
-            let name = path.file_stem()
+            let name = path
+                .file_stem()
                 .and_then(|n| n.to_str())
                 .unwrap_or("")
                 .to_string();
 
             // Явно указываем тип метаданных
-            let size_bytes: u64 = tokio::fs::metadata(&path).await
+            let size_bytes: u64 = tokio::fs::metadata(&path)
+                .await
                 .map(|m| m.len())
                 .unwrap_or(0);
 
-            models.push(ModelInfo { name, filename, size_bytes });
+            models.push(ModelInfo {
+                name,
+                filename,
+                size_bytes,
+            });
         }
 
         Ok(models)
@@ -87,7 +95,10 @@ impl ModelManager for LocalFsModelManager {
         if path.exists() {
             Ok(path)
         } else {
-            Err(AppError::ModelNotFound(format!("Модель не найдена: {:?}", path)))
+            Err(AppError::ModelNotFound(format!(
+                "Модель не найдена: {:?}",
+                path
+            )))
         }
     }
 }

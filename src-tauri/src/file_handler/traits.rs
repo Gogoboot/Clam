@@ -1,6 +1,6 @@
+use crate::error::AppError;
 use async_trait::async_trait;
 use std::path::{Path, PathBuf};
-use crate::error::AppError;
 
 #[async_trait]
 pub trait FileHandler: Send + Sync {
