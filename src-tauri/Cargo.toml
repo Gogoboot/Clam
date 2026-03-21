@@ -1,0 +1,24 @@
+[package]
+name = "my-transcriber"
+version = "0.1.0"
+description = "A Tauri App"
+authors = ["you"]
+edition = "2021"
+
+[lib]
+name = "my_transcriber_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] } # базовая фича
+tauri-plugin-shell = "2" # для запуска внешних процессов
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1"
+async-trait = "0.1"
+tokio = { version = "1", features = ["full"] }
+anyhow = "1"
