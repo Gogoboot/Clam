@@ -23,6 +23,9 @@ pub enum AppError {
     // Общая внутренняя ошибка — для неожиданных ситуаций
     #[error("Internal error: {0}")]
     Internal(String),
+
+    #[error("LLM error: {0}")]
+    Llm(String),
 }
 
 impl serde::Serialize for AppError {

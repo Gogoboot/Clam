@@ -9,6 +9,7 @@ mod error;
 mod file_handler;
 mod model_manager;
 mod transcriber;
+mod llm;
 
 use app::AppState;
 use file_handler::basic::BasicFileHandler;
@@ -34,6 +35,11 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::transcribe,
             commands::list_models,
+            commands::process_with_llm, 
+            commands::list_prompt_styles,
+            commands::get_llm_settings,    
+            commands::set_llm_settings,    
+            commands::check_llm_connection,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
