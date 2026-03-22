@@ -919,6 +919,74 @@ h1 {
   background: var(--border);
 }
 
+
+/* ===========================
+   Ползунок переключения темы
+   =========================== */
+.theme-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.theme-switch-label {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Контейнер ползунка */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+/* Скрываем стандартный чекбокс */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+/* Дорожка ползунка */
+.switch-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+/* Кружок ползунка */
+.switch-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Состояние включён (тёмная тема) */
+.switch input:checked + .switch-slider {
+  background: var(--accent);
+}
+
+/* Кружок сдвигается вправо */
+.switch input:checked + .switch-slider::before {
+  transform: translateX(18px);
+}
+
+
 /* ===========================
    Индикаторы статуса
    =========================== */

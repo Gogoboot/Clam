@@ -686,9 +686,19 @@ function App() {
             {/* Настройки интерфейса */}
             <div className="panel-section">
               <div className="panel-section-title">⚙️ Интерфейс</div>
-              <button className="theme-btn" onClick={toggleTheme}>
-                {theme === "light" ? "🌙 Тёмная тема" : "☀️ Светлая тема"}
-              </button>
+              {/* Стало — ползунок */}
+                  <div className="theme-switch">
+                    <span className="theme-switch-label">☀️</span>
+                    <label className="switch">
+                      <input
+                        type="checkbox"
+                        checked={theme === "dark"}
+                        onChange={toggleTheme}
+                      />
+                      <span className="switch-slider" />
+                    </label>
+                    <span className="theme-switch-label">🌙</span>
+                  </div>
             </div>
           </div>
         )}
