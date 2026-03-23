@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { open, save } from "@tauri-apps/plugin-dialog";
 import { writeTextFile } from "@tauri-apps/plugin-fs";
@@ -211,6 +211,15 @@ function App() {
     return () => { unlisten.then(f => f()); };
   }, []);
 
+  // Отменяем запрос при размонтировании компонента
+  useEffect(() => {
+    return () => {
+      if (llmAbortController.current) {
+        llmAbortController.current.abort();
+      }
+    };
+  }, []);
+
   // ===========================
   // Обработчики — транскрипция
   // ===========================
@@ -305,65 +314,99 @@ function App() {
   // Обработчики — LLM
   // ===========================
 
-  // Стриминг ответа LLM напрямую из фронтенда → LM Studio
-  const handleLlmProcess = async () => {
-    if (!rawResult || !finalPrompt) return;
-    setIsLlmLoading(true);
-    setLlmResult("");
-    setLlmError(null);
-    setLlmElapsed(null);
-    setActiveTab("llm"); // переключаемся на вкладку LLM результата
+  // Храним контроллер отмены между вызовами
+// useRef — не вызывает перерендер при изменении
+const llmAbortController = useRef<AbortController | null>(null);
 
-    const startTime = Date.now();
-    try {
-      const response = await fetch(`${llmUrl}/v1/chat/completions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: llmModel,
-          messages: [
-            { role: "system", content: finalPrompt },
-            { role: "user", content: toPlainText(segments) },
-          ],
-          temperature: 0.3,
-          max_tokens: 2048,
-          stream: true,
-        }),
-      });
+// Стриминг ответа LLM с поддержкой отмены через AbortController
+const handleLlmProcess = async () => {
+  if (!rawResult || !finalPrompt) return;
 
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  // Отменяем предыдущий запрос если он ещё идёт
+  if (llmAbortController.current) {
+    llmAbortController.current.abort();
+  }
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      if (!reader) throw new Error("Стриминг не поддерживается");
+  // Создаём новый контроллер для этого запроса
+  const controller = new AbortController();
+  llmAbortController.current = controller;
 
-      let accumulated = "";
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split("\n").filter(line => line.startsWith("data: "));
-        for (const line of lines) {
-          const jsonStr = line.replace("data: ", "").trim();
-          if (jsonStr === "[DONE]") break;
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const delta = parsed.choices?.[0]?.delta?.content ?? "";
-            if (delta) {
-              accumulated += delta;
-              setLlmResult(accumulated);
-            }
-          } catch { }
-        }
+  setIsLlmLoading(true);
+  setLlmResult("");
+  setLlmError(null);
+  setLlmElapsed(null);
+  setActiveTab("llm");
+
+  const startTime = Date.now();
+  try {
+    const response = await fetch(`${llmUrl}/v1/chat/completions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      // Передаём signal — fetch автоматически прервётся при abort()
+      signal: controller.signal,
+      body: JSON.stringify({
+        model: llmModel,
+        messages: [
+          { role: "system", content: finalPrompt },
+          { role: "user", content: toPlainText(segments) },
+        ],
+        temperature: 0.3,
+        max_tokens: 2048,
+        stream: true,
+      }),
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const reader = response.body?.getReader();
+    const decoder = new TextDecoder();
+    if (!reader) throw new Error("Стриминг не поддерживается");
+
+    let accumulated = "";
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      const lines = chunk.split("\n").filter(line => line.startsWith("data: "));
+      for (const line of lines) {
+        const jsonStr = line.replace("data: ", "").trim();
+        if (jsonStr === "[DONE]") break;
+        try {
+          const parsed = JSON.parse(jsonStr);
+          const delta = parsed.choices?.[0]?.delta?.content ?? "";
+          if (delta) {
+            accumulated += delta;
+            setLlmResult(accumulated);
+          }
+        } catch { }
       }
-      setLlmElapsed(Date.now() - startTime);
-    } catch (e) {
-      setLlmError(`Ошибка LLM: ${e}`);
-    } finally {
-      setIsLlmLoading(false);
     }
-  };
+    setLlmElapsed(Date.now() - startTime);
+  } catch (e: unknown) {
+    // Игнорируем ошибку отмены — это нормальное поведение
+    if (e instanceof Error && e.name === "AbortError") {
+      console.log("LLM запрос отменён");
+      return;
+    }
+    setLlmError(`Ошибка LLM: ${e}`);
+  } finally {
+    setIsLlmLoading(false);
+    // Очищаем контроллер после завершения
+    llmAbortController.current = null;
+  }
+};
 
+// Отменяем запрос LLM — кнопка "Стоп"
+const handleLlmAbort = () => {
+  if (llmAbortController.current) {
+    llmAbortController.current.abort();
+    llmAbortController.current = null;
+    setIsLlmLoading(false);
+    setLlmError(null);
+  }
+};
+
+  //* ********************* */
   const handleLlmCopy = async () => {
     await navigator.clipboard.writeText(llmResult);
     setLlmCopied(true);
@@ -504,6 +547,16 @@ const toggleRightPanel = () => {
             >
               {isLlmLoading ? "⏳ Обработка..." : "🤖 Обработать"}
             </button>
+
+            {/* Кнопка отмены — появляется только во время обработки */}    
+            {isLlmLoading && (
+            <button
+              className="stop-btn"
+              onClick={handleLlmAbort}
+            >
+              ⏹ Остановить
+            </button>
+            )}
 
             {/* Ошибка LLM */}
             {llmError && <div className="error">{llmError}</div>}

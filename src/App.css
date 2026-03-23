@@ -1,103 +1,130 @@
-/* ===========================
-   Подключаем шрифт Inter
-   =========================== */
+/* ============================================================
+   1. ШРИФТЫ — загружаем первыми чтобы не было моргания текста
+   ============================================================ */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* ===========================
-   CSS переменные — светлая тема
-   =========================== */
+
+/* ============================================================
+   2. CSS ПЕРЕМЕННЫЕ
+   Светлая тема — значения по умолчанию
+   Тёмная тема — переопределяем через [data-theme="dark"]
+   ============================================================ */
+
+/* --- Светлая тема --- */
 :root {
-  --bg: #f0f2f5;
-  --bg-card: #ffffff;
+  /* Фоны */
+  --bg:         #f0f2f5;
+  --bg-card:    #ffffff;
   --bg-toolbar: #f8f9fa;
-  --bg-hover: #f0f2f5;
-  --bg-input: #ffffff;
-  --bg-panel: #ffffff;
+  --bg-hover:   #f0f2f5;
+  --bg-input:   #ffffff;
+  --bg-panel:   #ffffff;
 
-  --text-primary: #111827;
+  /* Текст */
+  --text-primary:   #111827;
   --text-secondary: #4b5563;
-  --text-muted: #9ca3af;
+  --text-muted:     #9ca3af;
 
-  --border: #e5e7eb;
+  /* Границы */
+  --border:        #e5e7eb;
   --border-dashed: #d1d5db;
 
-  --accent: #2563eb;
+  /* Акцент */
+  --accent:       #2563eb;
   --accent-hover: #1d4ed8;
 
+  /* Тени */
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
 
-  --error-bg: #fef2f2;
+  /* Ошибки */
+  --error-bg:     #fef2f2;
   --error-border: #fecaca;
-  --error-text: #dc2626;
+  --error-text:   #dc2626;
 
+  /* Предупреждения */
   --warning-text: #d97706;
 
-  --progress-bg: #0f172a;
+  /* Прогресс лог — терминальный стиль */
+  --progress-bg:   #0f172a;
   --progress-text: #34d399;
 
+  /* Таймкоды */
   --timecode-color: #9ca3af;
 
-  --radius: 8px;
+  /* Скругления */
+  --radius:    8px;
   --radius-sm: 6px;
 
-  /* Размеры колонок */
-  --left-panel-width: 220px;
+  /* Размеры layout */
+  --left-panel-width:  220px;
   --right-panel-width: 260px;
-  --header-height: 52px;
-  --statusbar-height: 28px;
-  --tabs-height: 38px;
+  --header-height:     52px;
+  --statusbar-height:  28px;
+  --tabs-height:       38px;
 }
 
-/* ===========================
-   Тёмная тема
-   =========================== */
+/* --- Тёмная тема --- */
 [data-theme="dark"] {
-  --bg: #0f1117;
-  --bg-card: #1a1d27;
+  /* Фоны */
+  --bg:         #0f1117;
+  --bg-card:    #1a1d27;
   --bg-toolbar: #1e2130;
-  --bg-hover: #252836;
-  --bg-input: #1e2130;
-  --bg-panel: #1a1d27;
+  --bg-hover:   #252836;
+  --bg-input:   #1e2130;
+  --bg-panel:   #1a1d27;
 
-  --text-primary: #f1f5f9;
+  /* Текст */
+  --text-primary:   #f1f5f9;
   --text-secondary: #94a3b8;
-  --text-muted: #475569;
+  --text-muted:     #475569;
 
-  --border: #2d3148;
+  /* Границы */
+  --border:        #2d3148;
   --border-dashed: #374151;
 
-  --accent: #3b82f6;
+  /* Акцент */
+  --accent:       #3b82f6;
   --accent-hover: #2563eb;
 
+  /* Тени */
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
   --shadow-md: 0 4px 12px rgba(0,0,0,0.3);
 
-  --error-bg: #1f1010;
+  /* Ошибки */
+  --error-bg:     #1f1010;
   --error-border: #4b1515;
-  --error-text: #f87171;
+  --error-text:   #f87171;
 
+  /* Предупреждения */
   --warning-text: #fbbf24;
 
-  --progress-bg: #080c14;
+  /* Прогресс лог */
+  --progress-bg:   #080c14;
   --progress-text: #34d399;
 
+  /* Таймкоды */
   --timecode-color: #475569;
 }
 
-/* ===========================
-   База
-   =========================== */
+
+/* ============================================================
+   3. БАЗА — сброс и базовые стили документа
+   Применяется ко всему — самый широкий охват
+   ============================================================ */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body, #root {
+/* Занимаем всё окно, запрещаем скролл на уровне документа */
+html,
+body,
+#root {
   height: 100%;
   width: 100%;
-  overflow: hidden; /* предотвращаем скролл на уровне body */
+  overflow: hidden;
 }
 
 body {
@@ -110,41 +137,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ===========================
-   ГЛАВНЫЙ LAYOUT — flex колонка
-   Шапка + Тело + Статусбар
-   =========================== */
-.app-layout {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-}
-
-/* ===========================
-   ШАПКА — фиксированная высота
-   =========================== */
-.app-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  height: var(--header-height);
-  padding: 0 0.75rem;
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0; /* не сжимается */
-  box-shadow: var(--shadow-sm);
-}
-
-/* Левая часть шапки — кнопка свернуть + заголовок */
-.app-header-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-
 h1 {
   font-size: 1rem;
   font-weight: 700;
@@ -153,16 +145,50 @@ h1 {
   white-space: nowrap;
 }
 
-/* Центральная часть шапки — растягивается */
+
+/* ============================================================
+   4. LAYOUT — главный скелет приложения
+   Три уровня: app-layout → app-header / app-body / statusbar
+   ============================================================ */
+
+/* Корневой контейнер — вертикальный flex */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* --- Шапка --- */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  height: var(--header-height);
+  padding: 0 0.75rem;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0; /* не сжимается при нехватке места */
+  box-shadow: var(--shadow-sm);
+}
+
+.app-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Центр шапки растягивается — занимает всё свободное место */
 .app-header-center {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   flex: 1;
-  min-width: 0; /* позволяет сжиматься */
+  min-width: 0; /* разрешаем сжиматься ниже content-size */
 }
 
-/* Правая часть шапки */
 .app-header-right {
   display: flex;
   align-items: center;
@@ -170,104 +196,20 @@ h1 {
   flex-shrink: 0;
 }
 
-/* Кнопка выбора файла в шапке */
-.file-btn-header {
-  flex: 1;
-  min-width: 0;
-  text-align: left;
-  padding: 0.45rem 0.75rem;
-  background: var(--bg);
-  border: 1.5px dashed var(--border-dashed);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-}
-
-.file-btn-header:hover:not(:disabled) {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-
-/* Главная кнопка в шапке */
-.primary-header {
-  flex-shrink: 0;
-  padding: 0.45rem 1.25rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
-  transition: background 0.15s, box-shadow 0.15s;
-}
-
-.primary-header:hover:not(:disabled) {
-  background: var(--accent-hover);
-  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.4);
-}
-
-.primary-header:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* Кнопка иконка */
-.icon-btn {
-  padding: 0.4rem 0.6rem;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 1rem;
-  cursor: pointer;
-  color: var(--text-secondary);
-  line-height: 1;
-  transition: background 0.15s;
-}
-
-.icon-btn:hover {
-  background: var(--bg-hover);
-}
-
-/* Кнопка свернуть/развернуть колонку */
-.collapse-btn {
-  padding: 0.35rem 0.55rem;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 0.75rem;
-  cursor: pointer;
-  color: var(--text-muted);
-  line-height: 1;
-  flex-shrink: 0;
-  transition: background 0.15s, color 0.15s;
-}
-
-.collapse-btn:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
-
-/* ===========================
-   ТЕЛО — три колонки
-   =========================== */
+/* --- Тело — три колонки --- */
 .app-body {
   display: flex;
   flex: 1;
-  overflow: hidden; /* дочерние элементы скроллятся сами */
-  min-height: 0;
+  overflow: hidden; /* каждая колонка скроллится независимо */
+  min-height: 0;   /* fix: flex-child не сжимается без этого */
 }
 
-/* ===========================
-   ЛЕВАЯ КОЛОНКА — стили промтов
-   =========================== */
+
+/* ============================================================
+   5. КОЛОНКИ — левая, центральная, правая
+   ============================================================ */
+
+/* --- Левая колонка — стили промтов --- */
 .left-panel {
   width: var(--left-panel-width);
   flex-shrink: 0;
@@ -281,7 +223,29 @@ h1 {
   overflow-x: hidden;
 }
 
-/* Заголовок панели */
+/* --- Центральная область --- */
+.center-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* --- Правая колонка — настройки --- */
+.right-panel {
+  width: var(--right-panel-width);
+  flex-shrink: 0;
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Заголовок панели (левой и правой) */
 .panel-title {
   font-size: 0.8rem;
   font-weight: 600;
@@ -292,14 +256,210 @@ h1 {
   border-bottom: 1px solid var(--border);
 }
 
-/* Список стилей — вертикальный */
+/* Секция внутри правой панели */
+.panel-section {
+  padding: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.panel-section-title {
+  font-size: 0.775rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Горизонтальный разделитель между секциями */
+.panel-divider {
+  height: 1px;
+  background: var(--border);
+}
+
+/* Информационная строка в панели */
+.settings-info {
+  font-size: 0.775rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 0.2rem 0;
+}
+
+
+/* ============================================================
+   6. ВКЛАДКИ — навигация в стиле браузера
+   ============================================================ */
+.tabs-bar {
+  display: flex;
+  align-items: flex-end;
+  height: var(--tabs-height);
+  background: var(--bg-toolbar);
+  border-bottom: 1px solid var(--border);
+  padding: 0 0.5rem;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.875rem;
+  font-size: 0.825rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  position: relative;
+  bottom: -1px; /* перекрываем нижнюю границу .tabs-bar */
+}
+
+.tab:hover:not(.active) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Активная вкладка сливается с контентом */
+.tab.active {
+  background: var(--bg);
+  color: var(--text-primary);
+  border-color: var(--border);
+  border-bottom-color: var(--bg); /* скрываем нижнюю границу */
+  font-weight: 600;
+}
+
+/* Маленькая точка-индикатор на вкладке */
+.tab-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.tab-dot.active  { background: #16a34a; }
+.tab-dot.loading { background: var(--accent); animation: pulse 1s infinite; }
+
+/* Содержимое вкладки — скроллится независимо */
+.tab-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tab-content::-webkit-scrollbar       { width: 6px; }
+.tab-content::-webkit-scrollbar-track { background: transparent; }
+.tab-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+
+/* ============================================================
+   7. КОМПОНЕНТЫ — переиспользуемые UI блоки
+   ============================================================ */
+
+/* --- Тулбар результата --- */
+.result-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-toolbar);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+/* --- Блок текста результата --- */
+.result {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+.result::-webkit-scrollbar       { width: 6px; }
+.result::-webkit-scrollbar-track { background: transparent; }
+.result::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* --- Сегмент транскрипции с таймкодом --- */
+.segment {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  margin-bottom: 0.6rem;
+  align-items: baseline;
+}
+
+.timecode {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.7rem;
+  color: var(--timecode-color);
+  white-space: nowrap;
+}
+
+.segment-text {
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+/* --- Пустое состояние вкладки --- */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-height: 200px;
+  color: var(--text-muted);
+}
+
+.empty-icon { font-size: 2.5rem; opacity: 0.5; }
+.empty-state p { font-size: 0.875rem; }
+
+/* --- Прогресс лог whisper (терминальный стиль) --- */
+.progress-log {
+  background: var(--progress-bg);
+  color: var(--progress-text);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.72rem;
+  padding: 0.6rem 0.875rem;
+  border-radius: var(--radius-sm);
+  max-height: 80px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.progress-line {
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* --- Список стилей промтов --- */
 .style-list {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
 }
 
-/* Кнопка стиля */
 .style-item {
   display: flex;
   align-items: center;
@@ -333,11 +493,7 @@ h1 {
   background: rgba(59, 130, 246, 0.15);
 }
 
-.style-icon {
-  font-size: 1rem;
-  flex-shrink: 0;
-}
-
+.style-icon  { font-size: 1rem; flex-shrink: 0; }
 .style-label {
   font-size: 0.85rem;
   white-space: nowrap;
@@ -345,406 +501,7 @@ h1 {
   text-overflow: ellipsis;
 }
 
-/* Поле своего промта */
-.custom-prompt {
-  width: 100%;
-  padding: 0.6rem;
-  font-family: inherit;
-  font-size: 0.85rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-input);
-  color: var(--text-primary);
-  resize: vertical;
-  outline: none;
-  transition: border-color 0.15s;
-  min-height: 80px;
-}
-
-.custom-prompt:focus {
-  border-color: var(--accent);
-}
-
-/* Основная кнопка в левой панели */
-.primary {
-  width: 100%;
-  padding: 0.65rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  background: var(--accent);
-  color: white;
-  border: none;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
-  transition: background 0.15s, box-shadow 0.15s;
-  text-align: center;
-}
-
-.primary:hover:not(:disabled) {
-  background: var(--accent-hover);
-  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
-}
-
-.primary:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* ===========================
-   ЦЕНТРАЛЬНАЯ ОБЛАСТЬ
-   =========================== */
-.center-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  overflow: hidden;
-  background: var(--bg);
-}
-
-/* ===========================
-   ВКЛАДКИ — в стиле браузера
-   =========================== */
-.tabs-bar {
-  display: flex;
-  align-items: flex-end;
-  height: var(--tabs-height);
-  background: var(--bg-toolbar);
-  border-bottom: 1px solid var(--border);
-  padding: 0 0.5rem;
-  gap: 0.25rem;
-  flex-shrink: 0;
-}
-
-/* Отдельная вкладка */
-.tab {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.875rem;
-  font-size: 0.825rem;
-  font-weight: 500;
-  border: 1px solid transparent;
-  border-bottom: none;
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  position: relative;
-  bottom: -1px; /* перекрываем нижнюю границу tabs-bar */
-}
-
-.tab:hover:not(.active) {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
-
-/* Активная вкладка */
-.tab.active {
-  background: var(--bg);
-  color: var(--text-primary);
-  border-color: var(--border);
-  border-bottom-color: var(--bg); /* скрываем нижнюю границу */
-  font-weight: 600;
-}
-
-/* Точка-индикатор на вкладке */
-.tab-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--text-muted);
-  flex-shrink: 0;
-}
-
-.tab-dot.active {
-  background: #16a34a;
-}
-
-.tab-dot.loading {
-  background: var(--accent);
-  animation: pulse 1s infinite;
-}
-
-/* ===========================
-   СОДЕРЖИМОЕ ВКЛАДКИ
-   =========================== */
-.tab-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.tab-content::-webkit-scrollbar {
-  width: 6px;
-}
-
-.tab-content::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.tab-content::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-
-/* Тулбар результата */
-.result-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0.75rem;
-  background: var(--bg-toolbar);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-
-/* Результат текст */
-.result {
-  flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
-  font-size: 0.9rem;
-  line-height: 1.7;
-  color: var(--text-primary);
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-top: none;
-  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
-}
-
-.result::-webkit-scrollbar {
-  width: 6px;
-}
-
-.result::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.result::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-
-/* Сегмент с таймкодом */
-.segment {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.75rem;
-  margin-bottom: 0.6rem;
-  align-items: baseline;
-}
-
-.timecode {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 0.7rem;
-  color: var(--timecode-color);
-  white-space: nowrap;
-}
-
-.segment-text {
-  color: var(--text-primary);
-  font-size: 0.875rem;
-}
-
-/* Пустое состояние */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  flex: 1;
-  min-height: 200px;
-  color: var(--text-muted);
-}
-
-.empty-icon {
-  font-size: 2.5rem;
-  opacity: 0.5;
-}
-
-.empty-state p {
-  font-size: 0.875rem;
-}
-
-/* ===========================
-   ПРАВАЯ КОЛОНКА — настройки
-   =========================== */
-.right-panel {
-  width: var(--right-panel-width);
-  flex-shrink: 0;
-  background: var(--bg-panel);
-  border-left: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-/* Секция в правой панели */
-.panel-section {
-  padding: 0.875rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.panel-section-title {
-  font-size: 0.775rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding-bottom: 0.25rem;
-  border-bottom: 1px solid var(--border);
-}
-
-/* Разделитель между секциями */
-.panel-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 0;
-}
-
-/* Select в правой панели */
-.settings-select {
-  width: 100%;
-  padding: 0.45rem 0.6rem;
-  font-size: 0.85rem;
-  font-family: inherit;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-input);
-  color: var(--text-primary);
-  cursor: pointer;
-  outline: none;
-  transition: border-color 0.15s;
-}
-
-.settings-select:focus {
-  border-color: var(--accent);
-}
-
-/* Поле настройки */
-.settings-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-}
-
-.settings-field label {
-  font-size: 0.775rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-/* Input настройки */
-.settings-input {
-  width: 100%;
-  padding: 0.45rem 0.6rem;
-  font-family: inherit;
-  font-size: 0.85rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-input);
-  color: var(--text-primary);
-  outline: none;
-  transition: border-color 0.15s;
-}
-
-.settings-input:focus {
-  border-color: var(--accent);
-}
-
-/* Инфо строка в настройках */
-.settings-info {
-  font-size: 0.775rem;
-  color: var(--text-muted);
-  text-align: center;
-  padding: 0.2rem 0;
-}
-
-/* Кнопка темы */
-.theme-btn {
-  width: 100%;
-  padding: 0.5rem;
-  font-size: 0.85rem;
-  font-weight: 500;
-  background: var(--bg-hover);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  cursor: pointer;
-  text-align: center;
-  transition: background 0.15s;
-}
-
-.theme-btn:hover {
-  background: var(--bg);
-  color: var(--text-primary);
-}
-
-/* ===========================
-   Общие элементы
-   =========================== */
-
-/* Переключатели режима */
-.toggle-group {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.toggle {
-  padding: 0.25rem 0.6rem;
-  font-size: 0.8rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text-secondary);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.toggle.active {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-}
-
-/* Кнопки действий */
-.action-group {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.action-btn {
-  padding: 0.25rem 0.6rem;
-  font-size: 0.8rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text-secondary);
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.action-btn:hover:not(:disabled) {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
-
-/* Лейбл результата LLM */
+/* --- Лейбл результата LLM --- */
 .llm-result-label {
   font-size: 0.85rem;
   font-weight: 600;
@@ -754,26 +511,20 @@ h1 {
   gap: 0.4rem;
 }
 
-/* Прогресс лог */
-.progress-log {
-  background: var(--progress-bg);
-  color: var(--progress-text);
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 0.72rem;
-  padding: 0.6rem 0.875rem;
-  border-radius: var(--radius-sm);
-  max-height: 80px;
-  overflow-y: auto;
+/* --- Индикаторы состояния --- */
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted);
   flex-shrink: 0;
 }
 
-.progress-line {
-  line-height: 1.5;
-  white-space: pre-wrap;
-  word-break: break-all;
-}
+.status-dot.active  { background: #16a34a; box-shadow: 0 0 4px #16a34a; }
+.status-dot.error   { background: var(--error-text); }
+.status-dot.loading { background: var(--accent); animation: pulse 1s infinite; }
 
-/* Ошибка */
+/* --- Ошибки и предупреждения --- */
 .error {
   padding: 0.65rem 0.875rem;
   background: var(--error-bg);
@@ -784,52 +535,21 @@ h1 {
   flex-shrink: 0;
 }
 
-/* Предупреждение */
-.warning {
-  color: var(--warning-text);
-  font-size: 0.85rem;
-}
+.warning { color: var(--warning-text); font-size: 0.85rem; }
+.status-ok  { font-size: 0.8rem; color: #16a34a; font-weight: 500; }
+.status-err { font-size: 0.8rem; color: var(--error-text); font-weight: 500; }
 
-/* Статус подключения */
-.status-ok {
-  font-size: 0.8rem;
-  color: #16a34a;
-  font-weight: 500;
-}
+/* --- Markdown стили внутри .result --- */
+.result ul,
+.result ol    { padding-left: 1.5rem; margin: 0.5rem 0; }
+.result li    { margin-bottom: 0.3rem; line-height: 1.6; }
+.result p     { margin-bottom: 0.75rem; }
+.result p:last-child { margin-bottom: 0; }
+.result strong { font-weight: 600; color: var(--text-primary); }
 
-.status-err {
-  font-size: 0.8rem;
-  color: var(--error-text);
-  font-weight: 500;
-}
-
-/* ===========================
-   Markdown стили
-   =========================== */
-.result ul, .result ol {
-  padding-left: 1.5rem;
-  margin: 0.5rem 0;
-}
-
-.result li {
-  margin-bottom: 0.3rem;
-  line-height: 1.6;
-}
-
-.result p {
-  margin-bottom: 0.75rem;
-}
-
-.result p:last-child {
-  margin-bottom: 0;
-}
-
-.result strong {
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.result h1, .result h2, .result h3 {
+.result h1,
+.result h2,
+.result h3 {
   font-weight: 600;
   margin: 0.75rem 0 0.4rem;
   color: var(--text-primary);
@@ -850,9 +570,306 @@ h1 {
   font-size: 0.85em;
 }
 
-/* ===========================
-   СТАТУСНАЯ СТРОКА
-   =========================== */
+
+/* ============================================================
+   8. КНОПКИ — все варианты кнопок приложения
+   ============================================================ */
+
+/* Базовый сброс для всех кнопок */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s, box-shadow 0.15s;
+}
+
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Главная акцентная кнопка — в левой панели */
+.primary {
+  width: 100%;
+  padding: 0.65rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  text-align: center;
+}
+
+.primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
+}
+
+/* Главная кнопка в шапке — компактнее */
+.primary-header {
+  flex-shrink: 0;
+  padding: 0.45rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+}
+
+.primary-header:hover:not(:disabled) {
+  background: var(--accent-hover);
+  box-shadow: 0 3px 10px rgba(37, 99, 235, 0.4);
+}
+
+/* Кнопка выбора файла в шапке */
+.file-btn-header {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  padding: 0.45rem 0.75rem;
+  background: var(--bg);
+  border: 1.5px dashed var(--border-dashed);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-btn-header:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Кнопка-иконка (тема и др.) */
+.icon-btn {
+  padding: 0.4rem 0.6rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+.icon-btn:hover { background: var(--bg-hover); }
+
+/* Кнопка свернуть/развернуть колонку */
+.collapse-btn {
+  padding: 0.35rem 0.55rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.collapse-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Переключатель режима (с таймкодами / чистый текст) */
+.toggle-group { display: flex; gap: 0.25rem; }
+
+.toggle {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.toggle.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+/* Кнопки действий (копировать, TXT, SRT) */
+.action-group { display: flex; gap: 0.25rem; }
+
+.action-btn {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.action-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Кнопка остановки LLM */
+.stop-btn {
+  width: 100%;
+  padding: 0.65rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background: var(--error-bg);
+  color: var(--error-text);
+  border: 1px solid var(--error-border);
+  border-radius: var(--radius-sm);
+  text-align: center;
+}
+
+.stop-btn:hover { background: var(--error-border); }
+
+/* Кнопка темы в правой панели */
+.theme-btn {
+  width: 100%;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.theme-btn:hover {
+  background: var(--bg);
+  color: var(--text-primary);
+}
+
+
+/* ============================================================
+   9. ФОРМЫ — поля ввода, select, textarea
+   ============================================================ */
+
+/* Select в правой панели */
+.settings-select {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.85rem;
+  font-family: inherit;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.settings-select:focus { border-color: var(--accent); }
+
+/* Обёртка поля настройки (label + input) */
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.settings-field label {
+  font-size: 0.775rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Текстовый input настройки */
+.settings-input {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.settings-input:focus { border-color: var(--accent); }
+
+/* Textarea для своего промта */
+.custom-prompt {
+  width: 100%;
+  padding: 0.6rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+  min-height: 80px;
+}
+
+.custom-prompt:focus { border-color: var(--accent); }
+
+/* Ползунок переключения темы */
+.theme-switch {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+
+.theme-switch-label { font-size: 1rem; line-height: 1; }
+
+/* Контейнер toggle-switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+/* Скрываем нативный чекбокс */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+/* Дорожка */
+.switch-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+/* Кружок */
+.switch-slider::before {
+  content: '';
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  left: 3px;
+  top: 3px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.switch input:checked + .switch-slider           { background: var(--accent); }
+.switch input:checked + .switch-slider::before   { transform: translateX(18px); }
+
+
+/* ============================================================
+   10. СТАТУСНАЯ СТРОКА — нижняя панель информации
+   ============================================================ */
 .statusbar {
   height: var(--statusbar-height);
   background: var(--bg-card);
@@ -884,6 +901,7 @@ h1 {
   gap: 0.3rem;
 }
 
+/* Время операции */
 .statusbar-time {
   font-size: 0.7rem;
   color: var(--text-muted);
@@ -892,6 +910,7 @@ h1 {
   border-radius: 4px;
 }
 
+/* Бейдж модели */
 .statusbar-badge {
   font-size: 0.7rem;
   padding: 0.1rem 0.35rem;
@@ -899,20 +918,21 @@ h1 {
   font-weight: 500;
 }
 
+/* Синий бейдж — whisper модель */
 .whisper-badge {
   background: rgba(37, 99, 235, 0.1);
   color: var(--accent);
 }
 
+/* Фиолетовый бейдж — LLM модель */
 .llm-badge {
   background: rgba(124, 58, 237, 0.1);
   color: #7c3aed;
 }
 
-[data-theme="dark"] .llm-badge {
-  color: #a78bfa;
-}
+[data-theme="dark"] .llm-badge { color: #a78bfa; }
 
+/* Вертикальный разделитель между элементами */
 .statusbar-divider {
   width: 1px;
   height: 14px;
@@ -920,99 +940,10 @@ h1 {
 }
 
 
-/* ===========================
-   Ползунок переключения темы
-   =========================== */
-.theme-switch {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0;
-}
-
-.theme-switch-label {
-  font-size: 1rem;
-  line-height: 1;
-}
-
-/* Контейнер ползунка */
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 42px;
-  height: 24px;
-  flex-shrink: 0;
-}
-
-/* Скрываем стандартный чекбокс */
-.switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-  position: absolute;
-}
-
-/* Дорожка ползунка */
-.switch-slider {
-  position: absolute;
-  inset: 0;
-  background: var(--border);
-  border-radius: 24px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-/* Кружок ползунка */
-.switch-slider::before {
-  content: '';
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  left: 3px;
-  top: 3px;
-  background: white;
-  border-radius: 50%;
-  transition: transform 0.3s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-}
-
-/* Состояние включён (тёмная тема) */
-.switch input:checked + .switch-slider {
-  background: var(--accent);
-}
-
-/* Кружок сдвигается вправо */
-.switch input:checked + .switch-slider::before {
-  transform: translateX(18px);
-}
-
-
-/* ===========================
-   Индикаторы статуса
-   =========================== */
-.status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--text-muted);
-  flex-shrink: 0;
-}
-
-.status-dot.active {
-  background: #16a34a;
-  box-shadow: 0 0 4px #16a34a;
-}
-
-.status-dot.error {
-  background: var(--error-text);
-}
-
-.status-dot.loading {
-  background: var(--accent);
-  animation: pulse 1s infinite;
-}
-
+/* ============================================================
+   11. АНИМАЦИИ — всегда последними
+   ============================================================ */
 @keyframes pulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  50%       { opacity: 0.4; }
 }
