@@ -4,6 +4,7 @@ import { open, save } from "@tauri-apps/plugin-dialog";
 import { writeTextFile } from "@tauri-apps/plugin-fs";
 import { listen } from "@tauri-apps/api/event";
 import ReactMarkdown from "react-markdown";
+import { load } from '@tauri-apps/plugin-store';
 import "./App.css";
 
 // ===========================
@@ -127,6 +128,20 @@ function App() {
     ? customPrompt
     : (selectedStyle?.prompt ?? "");
 
+  // Сохраняем настройки в store при каждом изменении
+  // autoSave: true — автоматически записывает на диск
+  const saveSettings = async (updates: Record<string, unknown>) => {
+    try {
+      const store = await load('settings.json');
+      for (const [key, value] of Object.entries(updates)) {
+        await store.set(key, value);
+      }
+    } catch (e) {
+      console.error('Ошибка сохранения настроек:', e);
+    }
+  };
+
+    
   // ===========================
   // Эффекты
   // ===========================
@@ -136,8 +151,9 @@ function App() {
     document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
-  // Загружаем данные при старте
+  // Загружаем данные при старте — с сохранением между сессиями
   useEffect(() => {
+    // Список моделей whisper
     invoke<ModelInfo[]>("list_models")
       .then(list => {
         setModels(list);
@@ -145,14 +161,44 @@ function App() {
       })
       .catch(e => setError(`Ошибка загрузки моделей: ${e}`));
 
+    // Библиотека промтов
     invoke<PromptStyle[]>("list_prompt_styles")
       .then(styles => setPromptStyles(styles))
       .catch(e => console.error("Ошибка загрузки стилей:", e));
 
-    invoke<LlmSettings>("get_llm_settings")
-      .then(s => {
-        setLlmUrl(s.base_url);
-        setLlmModel(s.model);
+    // invoke<LlmSettings>("get_llm_settings")
+    //   .then(s => {
+    //     setLlmUrl(s.base_url);
+    //     setLlmModel(s.model);
+        // Загружаем сохранённые настройки из store
+        // store — это JSON файл на диске в папке приложения
+        load('settings.json').then(async store => {
+          // Тема
+          const savedTheme = await store.get<'light' | 'dark'>('theme');
+          if (savedTheme) setTheme(savedTheme);
+
+          // URL LLM сервера
+          const savedUrl = await store.get<string>('llmUrl');
+          if (savedUrl) setLlmUrl(savedUrl);
+
+          // Модель LLM
+          const savedModel = await store.get<string>('llmModel');
+          if (savedModel) setLlmModel(savedModel);
+
+          // Выбранная модель whisper
+          const savedWhisper = await store.get<string>('selectedModel');
+          if (savedWhisper) setSelectedModel(savedWhisper);
+
+          // Состояние колонок
+          const savedLeftCollapsed = await store.get<boolean>('leftCollapsed');
+          if (savedLeftCollapsed !== null && savedLeftCollapsed !== undefined) {
+            setLeftCollapsed(savedLeftCollapsed);
+          }
+          const savedRightCollapsed = await store.get<boolean>('rightCollapsed');
+          if (savedRightCollapsed !== null && savedRightCollapsed !== undefined) {
+            setRightCollapsed(savedRightCollapsed);
+          }
+      
       })
       .catch(console.error);
   }, []);
@@ -246,12 +292,14 @@ function App() {
       await invoke("set_llm_settings", { baseUrl: llmUrl, model: llmModel });
       const response = await fetch(`${llmUrl}/v1/models`);
       setLlmConnected(response.ok);
+  // Сохраняем в store
+    await saveSettings({ llmUrl, llmModel });
     } catch {
       setLlmConnected(false);
     } finally {
       setIsSavingSettings(false);
     }
-  };
+    };
 
   // ===========================
   // Обработчики — LLM
@@ -330,7 +378,26 @@ function App() {
     if (savePath) await writeTextFile(savePath, llmResult);
   };
 
-  const toggleTheme = () => setTheme(t => t === "light" ? "dark" : "light");
+// Переключаем тему и сохраняем
+const toggleTheme = () => {
+  const newTheme = theme === "light" ? "dark" : "light";
+  setTheme(newTheme);
+  saveSettings({ theme: newTheme });
+};
+
+// Сворачиваем левую колонку и сохраняем
+const toggleLeftPanel = () => {
+  const newVal = !leftCollapsed;
+  setLeftCollapsed(newVal);
+  saveSettings({ leftCollapsed: newVal });
+};
+
+// Сворачиваем правую колонку и сохраняем
+const toggleRightPanel = () => {
+  const newVal = !rightCollapsed;
+  setRightCollapsed(newVal);
+  saveSettings({ rightCollapsed: newVal });
+};
 
   // ===========================
   // Рендер
@@ -348,7 +415,7 @@ function App() {
           {/* Кнопка свернуть/развернуть левую колонку */}
           <button
             className="collapse-btn"
-            onClick={() => setLeftCollapsed(c => !c)}
+            onClick={toggleLeftPanel}
             title={leftCollapsed ? "Развернуть панель промтов" : "Свернуть панель промтов"}
           >
             {leftCollapsed ? "▶" : "◀"}
@@ -382,7 +449,7 @@ function App() {
           {/* Кнопка свернуть/развернуть правую колонку */}
           <button
             className="collapse-btn"
-            onClick={() => setRightCollapsed(c => !c)}
+            onClick={toggleRightPanel}
             title={rightCollapsed ? "Развернуть настройки" : "Свернуть настройки"}
           >
             {rightCollapsed ? "◀" : "▶"}
@@ -614,7 +681,10 @@ function App() {
               ) : (
                 <select
                   value={selectedModel}
-                  onChange={e => setSelectedModel(e.target.value)}
+                  onChange={e => {
+                   setSelectedModel(e.target.value)
+                   saveSettings({ selectedModel: e.target.value }); 
+                  }}
                   disabled={isLoading}
                   className="settings-select"
                 >

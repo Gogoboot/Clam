@@ -7,9 +7,9 @@ mod app;
 mod commands;
 mod error;
 mod file_handler;
+mod llm;
 mod model_manager;
 mod transcriber;
-mod llm;
 
 use app::AppState;
 use file_handler::basic::BasicFileHandler;
@@ -22,6 +22,7 @@ pub fn run() {
     let file_handler = Arc::new(BasicFileHandler);
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
@@ -35,10 +36,10 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::transcribe,
             commands::list_models,
-            commands::process_with_llm, 
+            commands::process_with_llm,
             commands::list_prompt_styles,
-            commands::get_llm_settings,    
-            commands::set_llm_settings,    
+            commands::get_llm_settings,
+            commands::set_llm_settings,
             commands::check_llm_connection,
         ])
         .run(tauri::generate_context!())

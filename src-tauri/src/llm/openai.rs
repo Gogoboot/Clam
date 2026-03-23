@@ -1,7 +1,7 @@
+use super::traits::{LlmClient, LlmRequest, LlmResponse};
+use crate::error::AppError;
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
-use crate::error::AppError;
-use super::traits::{LlmClient, LlmRequest, LlmResponse};
 
 /// Клиент для OpenAI-совместимых API
 /// Работает с: LM Studio, Ollama, OpenAI, любой совместимый сервер
@@ -46,7 +46,7 @@ struct ChatRequest {
 
 #[derive(Serialize)]
 struct ChatMessage {
-    role: String,   // "system" | "user" | "assistant"
+    role: String, // "system" | "user" | "assistant"
     content: String,
 }
 
@@ -75,18 +75,28 @@ impl LlmClient for OpenAiClient {
         let body = ChatRequest {
             model: self.model.clone(),
             messages: vec![
-                ChatMessage { role: "system".into(), content: request.system },
-                ChatMessage { role: "user".into(), content: request.user },
+                ChatMessage {
+                    role: "system".into(),
+                    content: request.system,
+                },
+                ChatMessage {
+                    role: "user".into(),
+                    content: request.user,
+                },
             ],
             temperature: 0.3, // низкая температура для точной обработки текста
             max_tokens: 1096,
         };
 
         // Логируем что отправляем
-        eprintln!("Отправляем запрос: {}", serde_json::to_string(&body).unwrap_or_default());
+        eprintln!(
+            "Отправляем запрос: {}",
+            serde_json::to_string(&body).unwrap_or_default()
+        );
 
         // Отправляем POST запрос
-        let response = self.client
+        let response = self
+            .client
             .post(&url)
             .header("User-Agent", "Mozilla/5.0")
             .header("Accept", "application/json")
@@ -103,7 +113,8 @@ impl LlmClient for OpenAiClient {
             let body = response.text().await.unwrap_or_default();
             eprintln!("Тело ошибки: {}", body);
             return Err(AppError::Llm(format!(
-                "LLM сервер вернул ошибку: {} — {}", status, body
+                "LLM сервер вернул ошибку: {} — {}",
+                status, body
             )));
         }
         // Парсим ответ
@@ -113,7 +124,8 @@ impl LlmClient for OpenAiClient {
             .map_err(|e| AppError::Llm(format!("Ошибка парсинга ответа LLM: {e}")))?;
 
         // Извлекаем текст из первого выбора
-        let text = chat_response.choices
+        let text = chat_response
+            .choices
             .into_iter()
             .next()
             .map(|c| c.message.content)

@@ -1,8 +1,8 @@
-use tauri::{AppHandle, State};
 use crate::app::{AppState, LlmSettings};
 use crate::error::AppError;
+use crate::llm::{LlmClient, LlmRequest, OpenAiClient};
 use crate::model_manager::traits::ModelInfo;
-use crate::llm::{OpenAiClient, LlmClient, LlmRequest};
+use tauri::{AppHandle, State};
 
 // ===========================
 // Команды транскрипции
@@ -97,9 +97,7 @@ pub fn list_prompt_styles() -> Vec<PromptStyle> {
 
 /// Возвращает текущие настройки LLM на фронтенд
 #[tauri::command]
-pub async fn get_llm_settings(
-    state: State<'_, AppState>,
-) -> Result<LlmSettings, AppError> {
+pub async fn get_llm_settings(state: State<'_, AppState>) -> Result<LlmSettings, AppError> {
     let settings = state.llm_settings.read().await;
     Ok(settings.clone())
 }
@@ -121,9 +119,7 @@ pub async fn set_llm_settings(
 
 /// Проверяем доступность LLM сервера
 #[tauri::command]
-pub async fn check_llm_connection(
-    state: State<'_, AppState>,
-) -> Result<bool, AppError> {
+pub async fn check_llm_connection(state: State<'_, AppState>) -> Result<bool, AppError> {
     let settings = state.llm_settings.read().await;
     let client = OpenAiClient::new(&settings.base_url, &settings.model);
     Ok(client.is_available().await)
@@ -146,10 +142,12 @@ pub async fn process_with_llm(
     drop(settings);
 
     // Отправляем запрос без проверки is_available
-    let response = client.complete(LlmRequest {
-        system: prompt,
-        user: text,
-    }).await?;
+    let response = client
+        .complete(LlmRequest {
+            system: prompt,
+            user: text,
+        })
+        .await?;
 
     Ok(response.text)
 }
