@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { useSettings } from "./hooks/useSettings";
 import { useTranscription } from "./hooks/useTranscription";
 import { useLLM } from "./hooks/useLLM";
 import { bytesToHuman, formatDuration } from "./utils/transcriptionUtils";
+// import { parseSegments, toSrt, toPlainText } from "./utils/transcriptionUtils";
 import "./App.css";
 
 function App() {
@@ -286,6 +287,21 @@ function App() {
                   ))}
                 </select>
               )}
+
+                {/* Выбор языка — новый элемент */}
+                  <select
+                    value={transcription.language}
+                    onChange={e => transcription.setLanguage(e.target.value)}
+                    disabled={transcription.isLoading}
+                    className="settings-select"
+                  >
+                    {transcription.WHISPER_LANGUAGES.map(lang => (
+                      <option key={lang.code} value={lang.code}>
+                        {lang.label}
+                      </option>
+                    ))}
+                  </select>
+
               {transcription.elapsed !== null && (
                 <div className="settings-info">
                   ⏱ {formatDuration(transcription.elapsed)}

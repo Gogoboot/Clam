@@ -19,6 +19,22 @@ export interface ModelInfo {
   size_bytes: number;
 }
 
+// Список поддерживаемых языков
+// whisper поддерживает 99 языков — добавляем самые популярные
+export const WHISPER_LANGUAGES = [
+  { code: "auto", label: "🌐 Авто" },
+  { code: "ru",   label: "🇷🇺 Русский" },
+  { code: "en",   label: "🇺🇸 Английский" },
+  { code: "de",   label: "🇩🇪 Немецкий" },
+  { code: "fr",   label: "🇫🇷 Французский" },
+  { code: "es",   label: "🇪🇸 Испанский" },
+  { code: "it",   label: "🇮🇹 Итальянский" },
+  { code: "zh",   label: "🇨🇳 Китайский" },
+  { code: "ja",   label: "🇯🇵 Японский" },
+  { code: "uk",   label: "🇺🇦 Украинский" },
+] as const;
+
+
 // ===========================
 // Хук
 // ===========================
@@ -34,6 +50,11 @@ export function useTranscription(saveSettings: (updates: Record<string, unknown>
   const [copied, setCopied] = useState<boolean>(false);
   const [elapsed, setElapsed] = useState<number | null>(null);
 
+  //состояние языка
+  const [language, setLanguage] = useState<string>("ru");
+
+  
+  
   // useMemo — пересчитываем только когда меняется rawResult
   const segments: TranscriptionSegment[] = useMemo(
     () => parseSegments(rawResult),
@@ -95,6 +116,7 @@ export function useTranscription(saveSettings: (updates: Record<string, unknown>
       const text = await invoke<string>("transcribe", {
         filePath,
         modelFilename: selectedModel,
+        language, // ← передаём язык
       });
       setRawResult(text);
       setElapsed(Date.now() - startTime);
@@ -156,5 +178,7 @@ export function useTranscription(saveSettings: (updates: Record<string, unknown>
     handleCopy,
     handleExportTxt,
     handleExportSrt,
+    language, setLanguage,
+    WHISPER_LANGUAGES,
   };
 }

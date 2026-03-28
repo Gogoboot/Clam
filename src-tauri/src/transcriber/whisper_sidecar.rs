@@ -19,23 +19,44 @@ impl WhisperSidecar {
 
 #[async_trait]
 impl Transcriber for WhisperSidecar {
-    async fn transcribe(&self, audio_path: &Path, model_path: &Path) -> Result<String, AppError> {
+    async fn transcribe(
+        &self,
+        audio_path: &Path,
+        model_path: &Path,
+        language: &str,
+    ) -> Result<String, AppError> {
+    
+    
+        // Формируем аргументы для whisper-cli
+        // Если язык "auto" — не передаём -l флаг,
+        // whisper сам определит язык по аудио
+    //***************************************** */
+    let mut args: Vec<&str> = Vec::new();
+
+        if language != "auto" {
+            // "-l ru" — явно указываем язык
+            args.push("-l");
+            args.push(language);
+        }
+
+        // Основные аргументы
+        let audio_str = audio_path.to_str().unwrap();
+        let model_str = model_path.to_str().unwrap();
+
+        args.extend_from_slice(&[
+            "-f", audio_str,
+            "-m", model_str,
+            "-ojf",                // вывод в JSON формате
+            "-of", audio_str,      // имя выходного файла
+        ]);
+
+        // Запускаем whisper-cli как sidecar процесс
         let (mut rx, _child) = self
             .app
             .shell()
             .sidecar("whisper-cli")
             .map_err(|e| AppError::Sidecar(e.to_string()))?
-            .args([
-                "-l",
-                "ru",
-                "-f",
-                audio_path.to_str().unwrap(),
-                "-m",
-                model_path.to_str().unwrap(),
-                "-ojf",
-                "-of",
-                audio_path.to_str().unwrap(),
-            ])
+            .args(args)
             .spawn()
             .map_err(|e| AppError::Sidecar(e.to_string()))?;
 
@@ -45,18 +66,22 @@ impl Transcriber for WhisperSidecar {
         // Читаем события построчно
         while let Some(event) = rx.recv().await {
             match event {
+                // Stdout — результат транскрипции (JSON)
                 CommandEvent::Stdout(line) => {
                     stdout_buf.extend_from_slice(&line);
                     stdout_buf.push(b'\n');
                 }
+                // Stderr — прогресс whisper, шлём на фронтенд через событие
                 CommandEvent::Stderr(line) => {
                     // Шлём прогресс на фронтенд
                     let msg = String::from_utf8_lossy(&line).to_string();
                     let _ = self.app.emit("transcribe-progress", msg);
                 }
+                // Ошибка запуска процесса
                 CommandEvent::Error(e) => {
                     return Err(AppError::Sidecar(e));
                 }
+                // Процесс завершился — запоминаем код выхода
                 CommandEvent::Terminated(status) => {
                     exit_code = status.code;
                     break;
@@ -64,8 +89,9 @@ impl Transcriber for WhisperSidecar {
                 _ => {}
             }
         }
-
+//****************************************************** */
         // Проверяем код выхода
+        // Ненулевой код — ошибка транскрипции
         if exit_code.unwrap_or(-1) != 0 {
             return Err(AppError::Transcription(format!(
                 "whisper-cli exited with code {:?}",
@@ -82,7 +108,7 @@ impl Transcriber for WhisperSidecar {
             }
         }
 
-        // Fallback — читаем json файл
+        // Fallback — читаем json файл который whisper создаёт рядом с аудио
         let json_path = audio_path.with_extension("wav.json");
         if json_path.exists() {
             let data = tokio::fs::read_to_string(&json_path).await?;

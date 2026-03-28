@@ -22,12 +22,22 @@ pub async fn transcribe(
     state: State<'_, AppState>,
     file_path: String,
     model_filename: String,
+    language: String, // ← новый параметр от фронтенда
 ) -> Result<String, AppError> {
     let path = std::path::PathBuf::from(&file_path);
+
+    // 1. Валидация файла
     state.file_handler.validate(&path).await?;
+
+     // 2. Подготовка файла
     let prepared = state.file_handler.prepare(&path).await?;
+
+    // 3. Получаем путь к модели
     let model_path = state.model_manager.get_model(&app, &model_filename).await?;
-    let text = state.transcriber.transcribe(&prepared, &model_path).await?;
+
+     // 4. Транскрибируем с указанным языком
+    let text = state.transcriber.transcribe(&prepared, &model_path,  &language).await?;
+    
     Ok(text)
 }
 
